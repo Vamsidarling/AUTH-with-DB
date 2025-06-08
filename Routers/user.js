@@ -19,6 +19,12 @@ UserRouter.post("/signup", async function (req, res) {
     const fname = req.body.fname;
     const lname = req.body.lname;
 
+    // const emailcheck = await UserModel.findOne({ email });
+    // if (emailcheck) {
+    //   res.json({
+    //     message: "email already taken ",
+    //   });
+    // }
     const Data = await UserModel.create({
       name,
       email,
@@ -31,8 +37,12 @@ UserRouter.post("/signup", async function (req, res) {
 
     res.json({ message: "user signup sucessfully " });
   } catch (err) {
+    // Duplicate email error code for MongoDB/Mongoose
+    if (err.code === 11000 && err.keyPattern && err.keyPattern.email) {
+      return res.status(409).json({ message: "Email already exists" });
+    }
     console.log(err);
-    res.json({
+    res.status(500).json({
       message: "signup error",
     });
   }
@@ -117,6 +127,20 @@ UserRouter.post("/GenerateData", usermiddleware, async function (req, res) {
 
   main().catch(console.error);
 });
+
+// UserRouter.post("/getDetailsWithQuestion", usermiddleware, async function (req, res) {
+//   const userId = req.user.userid;
+//   const question = req.body.question; // Get question from request body
+
+//   const data = await UserModel.findById(userId);
+
+//   res.json({
+//     data,
+//     question, // Echo back the question
+//     message: "User details fetched successfully with question",
+//   });
+// });
+
 module.exports = {
   UserRouter: UserRouter,
 };

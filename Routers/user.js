@@ -19,12 +19,12 @@ UserRouter.post("/signup", async function (req, res) {
     const fname = req.body.fname;
     const lname = req.body.lname;
 
-    // const emailcheck = await UserModel.findOne({ email });
-    // if (emailcheck) {
-    //   res.json({
-    //     message: "email already taken ",
-    //   });
-    // }
+    const emailcheck = await UserModel.findOne({ email });
+    if (emailcheck) {
+      return res.json({
+        message: "email already taken ",
+      });
+    }
     const Data = await UserModel.create({
       name,
       email,

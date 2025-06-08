@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { UserModel, histroymodel, CoursesModel } = require("../db");
+const { UserModel, HistoryModel } = require("../db");
 const bcrypt = require("bcrypt");
 const UserRouter = Router();
 const jwt = require("jsonwebtoken");
@@ -32,9 +32,6 @@ UserRouter.post("/signup", async function (req, res) {
       fname,
       lname,
     });
-    console.log(req.body);
-    console.log(Data);
-
     res.json({ message: "user signup sucessfully " });
   } catch (err) {
     // Duplicate email error code for MongoDB/Mongoose
@@ -99,7 +96,7 @@ UserRouter.post("/GenerateData", usermiddleware, async function (req, res) {
     apiKey: "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", // Replace with your actual API key
   });
 
-  async function main() {
+  try {
     const completion = await groq.chat.completions.create({
       model: "compound-beta",
       // System prompt to guide the model's behavior
@@ -114,18 +111,22 @@ UserRouter.post("/GenerateData", usermiddleware, async function (req, res) {
           content: question,
         },
       ],
-      // If the model supports tools, you can specify them here (example placeholder)
-
       // Optionally, set temperature for more focused output
       temperature: 0.7,
     });
     const ans = completion.choices[0]?.message?.content;
+   const history = await HistoryModel.create({
+      userId: req.user.userid,
+      quesion: question,
+      Response: ans,
+    });
     res.json({
       ans,
     });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error generating data" });
   }
-
-  main().catch(console.error);
 });
 
 // UserRouter.post("/getDetailsWithQuestion", usermiddleware, async function (req, res) {

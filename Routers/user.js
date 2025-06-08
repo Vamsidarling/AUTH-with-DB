@@ -1,4 +1,4 @@
-const { Router, json } = require("express");
+const { Router } = require("express");
 const { UserModel, histroymodel, CoursesModel } = require("../db");
 const bcrypt = require("bcrypt");
 const UserRouter = Router();
@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 const express = require("express");
 const { usermiddleware } = require("../middlewares/userAuth");
-
+const { Groq } = require("groq-sdk");
 // const usermiddleware = require(__dirname+"S:\WEB\Practice projects\Course sellling app\middlewares\userAuth.js")
 UserRouter.use(express.json());
 
@@ -75,6 +75,47 @@ UserRouter.get("/getDetails", usermiddleware, async function (req, res) {
     data,
     message: "User details fetched success",
   });
+});
+UserRouter.post("/GenerateData", usermiddleware, async function (req, res) {
+  const { question } = req.body; // Get question from request body
+
+  if (!question) {
+    return res
+      .status(400)
+      .json({ message: "Question is required in the request body." });
+  }
+
+  const groq = new Groq({
+    apiKey: "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", // Replace with your actual API key
+  });
+
+  async function main() {
+    const completion = await groq.chat.completions.create({
+      model: "compound-beta",
+      // System prompt to guide the model's behavior
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a social media assistant. Generate concise, sympathetic tweets about current events using the latest real-time data. If data is unavailable, state so clearly.",
+        },
+        {
+          role: "user",
+          content: question,
+        },
+      ],
+      // If the model supports tools, you can specify them here (example placeholder)
+
+      // Optionally, set temperature for more focused output
+      temperature: 0.7,
+    });
+    const ans = completion.choices[0]?.message?.content;
+    res.json({
+      ans,
+    });
+  }
+
+  main().catch(console.error);
 });
 module.exports = {
   UserRouter: UserRouter,

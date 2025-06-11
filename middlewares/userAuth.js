@@ -3,7 +3,7 @@ const { JWT_SECRET } = require("../config");
 const { UserModel } = require("../db");
 
 async function usermiddleware(req, res, next) {
-    const token = req.headers.token;
+    const token = req.cookie.token;
     if (!token) {
         console.log("No token provided");
         return res.status(401).json({

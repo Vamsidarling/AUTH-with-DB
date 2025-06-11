@@ -18,6 +18,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
     "mongose": "^0.0.2-security",
-    "npm": "^11.4.1"
+    "npm": "^11.4.1",
+    "react-router-dom": "^7.6.2"
   }
 }

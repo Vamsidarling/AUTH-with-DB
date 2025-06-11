@@ -65,6 +65,12 @@ UserRouter.post("/signin", async function (req, res) {
       },
       JWT_SECRET
     );
+    res.cookie("token" , token, {
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30), // Expires in 30 days
+      httpOnly: true, 
+      secure: false
+      // Ensures that the cookie is only accessible via HTTP requests
+    })
     res.json({
       message: "user sign in success ",
       token,
